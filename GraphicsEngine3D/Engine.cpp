@@ -162,8 +162,11 @@ void Engine::render() {
     //PrimitiveDrawer::drawTriangle(-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f); // Niebieski trójk¹t
 
     // Przyk³adowe rysowanie szeœcianu
-    IndexedCube cube(1.0f);
-    cube.draw(1.0f, 1.0f, 1.0f);
+    TransformableCube myCube(1.0f);
+    myCube.translate(glm::vec3(1.0f, 0.0f, 0.0f));
+    myCube.rotate(45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    myCube.scale(glm::vec3(2.0f, 1.0f, 1.0f));
+    myCube.draw(1.0f, 1.0f, 1.0f);
 
     // SprawdŸ czy kursor jest przechwytywany
     if (isCursorCaptured) {

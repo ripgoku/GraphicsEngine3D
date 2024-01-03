@@ -8,6 +8,7 @@
 #include "PrimitiveDrawer.h"
 #include "IndexedCube.h"
 #include "Camera.h"
+#include "TransformableCube.h"
 
 class Engine {
 public:
