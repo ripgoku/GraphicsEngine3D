@@ -39,7 +39,6 @@ void Engine::init(int width, int height, bool fullscreen, const char* name) {
 
     sun.setPosition(glm::vec3(3, 2, 0));
 
-    // Inicjacja GLUT
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(windowWidth, windowHeight);
     glutCreateWindow(windowTitle);
@@ -47,19 +46,17 @@ void Engine::init(int width, int height, bool fullscreen, const char* name) {
         glutFullScreen();
     }
 
-    // Inicjacja GLEW
     GLenum glewStatus = glewInit();
     if (glewStatus != GLEW_OK) {
         fprintf(stderr, "glewInit error: %s\n", glewGetErrorString(glewStatus));
         exit(EXIT_FAILURE);
     }
 
-    // Ustawienie funkcji do obs³ugi zdarzeñ
-    glutDisplayFunc(Engine::render); // Funkcja renderuj¹ca
-    glutReshapeFunc(Engine::reshape); // Funkcja do obs³ugi zmiany rozmiaru okna
-    glutKeyboardFunc(Engine::keyboard); // Funkcja do obs³ugi klawiatury
-    glutKeyboardUpFunc(Engine::keyboardUp); // Funkcja do obs³ugi zwolnienia klawiszy
-    glutPassiveMotionFunc(Engine::mouseMotion); // Funkcja do obs³ugi ruchu myszy
+    glutDisplayFunc(Engine::render);
+    glutReshapeFunc(Engine::reshape);
+    glutKeyboardFunc(Engine::keyboard);
+    glutKeyboardUpFunc(Engine::keyboardUp);
+    glutPassiveMotionFunc(Engine::mouseMotion);
     glutTimerFunc(1000 / framesPerSecond, Engine::timer, 0);
 
     initGL();
@@ -74,7 +71,7 @@ void Engine::setupViewport() {
     glViewport(0, 0, windowWidth, windowHeight);
 
     glm::mat4 projection = glm::perspective(glm::radians(60.0f), static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 100.0f);
-    glm::mat4 view = camera.getViewMatrix(); // U¿yj macierzy widoku z kamery
+    glm::mat4 view = camera.getViewMatrix();
 
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(projection));
@@ -99,7 +96,6 @@ void Engine::update() {
     float deltaTime = 1.0f / 10;
     angle += 0.1f * deltaTime;
 
-    // Obliczanie nowej pozycji na orbicie
     float x = 3.0f + 4.0f * cos(angle);
     float z = -1.0f + 4.0f * sin(angle);
 
@@ -215,19 +211,15 @@ void Engine::reshape(int width, int height) {
 
 void Engine::handleInput() {
     if (isWKeyPressed) {
-        // Poruszanie do przodu
         camera.move(glm::vec3(-1.0f, 0.0f, 0.0f));
     }
     if (isSKeyPressed) {
-        // Poruszanie do ty³u
         camera.move(glm::vec3(1.0f, 0.0f, 0.0f));
     }
     if (isAKeyPressed) {
-        // Przesuniêcie w lewo
         camera.move(glm::vec3(0.0f, 0.0f, -1.0f));
     }
     if (isDKeyPressed) {
-        // Przesuniêcie w prawo
         camera.move(glm::vec3(0.0f, 0.0f, 1.0f));
     }
 }
@@ -261,11 +253,11 @@ void Engine::keyboard(unsigned char key, int x, int y) {
         break;
     case 'f':
         if (!isFullscreen) {
-            glutFullScreen();  // W³¹cz tryb pe³noekranowy
+            glutFullScreen();
             isFullscreen = true;
         }
         else {
-            glutPositionWindow(0, 0); // Przywróæ pozycjê okna
+            glutPositionWindow(0, 0);
             reshape(windowWidth, windowWidth);
             isFullscreen = false;
         }
@@ -306,16 +298,12 @@ void Engine::mouseMotion(int x, int y) {
     static int lastX = windowWidth / 2;
     static int lastY = windowHeight / 2;
 
-    // SprawdŸ czy kursor jest przechwytywany
     if (isCursorCaptured) {
-        // Oblicz ró¿nicê pozycji myszy
         float xOffset = x - lastX;
         float yOffset = lastY - y;
 
-        // Obróæ kamerê na podstawie ruchu myszy
         camera.rotate(xOffset, yOffset);
 
-        // Ustaw kursor myszy w œrodku okna
         glutWarpPointer(windowWidth / 2, windowHeight / 2);
 
         lastX = windowWidth / 2;
@@ -324,12 +312,11 @@ void Engine::mouseMotion(int x, int y) {
 }
 
 void Engine::cleanUp() {
-    // Sprz¹tanie pamiêci, zamkniêcie okna itp.
     glutDestroyWindow(glutGetWindow());
 }
 
 void Engine::timer(int value) {
     update();
-    glutPostRedisplay(); // Przerysuj scenê
-    glutTimerFunc(1000 / framesPerSecond, Engine::timer, 0); // Ponownie ustaw timer
+    glutPostRedisplay();
+    glutTimerFunc(1000 / framesPerSecond, Engine::timer, 0);
 }

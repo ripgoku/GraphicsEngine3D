@@ -8,7 +8,7 @@ Cone::Cone(float base, float height, int slices, int stacks, Material type)
 void Cone::draw() const {
     applyMaterial();
 
-    glPushMatrix(); // Zapisuje obecn¹ macierz
+    glPushMatrix();
 
     glTranslatef(position.x, position.y, position.z);
     glRotatef(rotationAngle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
@@ -16,7 +16,7 @@ void Cone::draw() const {
 
     glutSolidCone(base, height, slices, stacks);
 
-    glPopMatrix(); // Przywraca poprzedni¹ macierz
+    glPopMatrix();
 }
 
 
