@@ -1,4 +1,4 @@
-<h1>Battleship-sinking-game</h1>
+<h1>GraphicsEngine3D</h1>
 <h2>INTRODUCTION</h2>
 A simple 3D "Graphics Engine" created entirely in C++ using OpenGL, GLM, GLEW and the stb_image.h library.
 
