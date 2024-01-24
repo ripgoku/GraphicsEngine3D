@@ -8,17 +8,15 @@ Ball::Ball(float radius, int slices, int stacks, Material type)
 void Ball::draw() const {
     applyMaterial();
 
-    glPushMatrix(); // Zapisuje obecn¹ macierz
+    glPushMatrix();
 
-    // Zastosuj transformacje
     glTranslatef(position.x, position.y, position.z);
     glRotatef(rotationAngle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
     glScalef(scale.x, scale.y, scale.z);
 
-    // Rysuj kostkê
     glutSolidSphere(radius, slices, stacks);
 
-    glPopMatrix(); // Przywraca poprzedni¹ macierz
+    glPopMatrix();
 }
 
 
@@ -41,23 +39,21 @@ void Ball::setScale(const glm::vec3& scl) {
 }
 
 void Ball::drawTexturedBall(const Texture& texture) {
-    texture.bind(); // Powi¹zanie tekstury
-    glEnable(GL_TEXTURE_2D); // W³¹czenie obs³ugi tekstur
+    texture.bind();
+    glEnable(GL_TEXTURE_2D);
 
-    glPushMatrix(); // Zapisuje obecn¹ macierz
+    glPushMatrix();
 
-    // Zastosuj transformacje
     glTranslatef(position.x, position.y, position.z);
     glRotatef(rotationAngle, rotationAxis.x, rotationAxis.y, rotationAxis.z);
     glScalef(scale.x, scale.y, scale.z);
 
-    // Rysuj sfere
     GLUquadric* quadric = gluNewQuadric();
     gluQuadricTexture(quadric, GL_TRUE);
     gluSphere(quadric, radius, slices, stacks);
     gluDeleteQuadric(quadric);
 
-    glPopMatrix(); // Przywraca poprzedni¹ macierz
+    glPopMatrix();
 
-    glDisable(GL_TEXTURE_2D); // Wy³¹czenie obs³ugi tekstur
+    glDisable(GL_TEXTURE_2D);
 }

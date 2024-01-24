@@ -11,11 +11,10 @@ void LightingManager::addLightSource(const LightSource& light) {
 void LightingManager::applyLighting() {
     for (auto& light : lightSources) {
         if (!light.isEnabled()) continue;
-        // Ustawienie pozycji œwiat³a
+
         glm::vec4 lightPos = light.getPosition();
         glLightfv(light.getLightId(), GL_POSITION, glm::value_ptr(lightPos));
 
-        // Ustawienia kolorów œwiat³a
         glm::vec4 ambient = light.getAmbient();
         glm::vec4 diffuse = light.getDiffuse();
         glm::vec4 specular = light.getSpecular();

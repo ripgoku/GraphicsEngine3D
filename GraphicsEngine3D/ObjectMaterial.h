@@ -8,12 +8,11 @@
 class ObjectMaterial
 {
 private:
-    //GLfloat ambient[4];   // Kolor bez œwiat³a
-    GLfloat diffuse[4];   // Kolor oœwietlony
-    GLfloat ambient[4];   // Kolor bez œwiat³a
-    GLfloat specular[4];  // Kolor po³ysku
-    GLfloat shininess;    // Stopieñ po³ysku
-    GLfloat emission[4];  // Kolor emisii
+    GLfloat diffuse[4];
+    GLfloat ambient[4];
+    GLfloat specular[4];
+    GLfloat shininess;
+    GLfloat emission[4];
 
 public:
     ObjectMaterial(float color[4]);
@@ -26,7 +25,7 @@ public:
     void apply() const;
 
     ObjectMaterial& operator=(const ObjectMaterial& other) {
-        if (this != &other) { // Ochrona przed samoprzypisaniem
+        if (this != &other) {
             std::copy(std::begin(other.ambient), std::end(other.ambient), std::begin(ambient));
             std::copy(std::begin(other.diffuse), std::end(other.diffuse), std::begin(diffuse));
             std::copy(std::begin(other.specular), std::end(other.specular), std::begin(specular));
