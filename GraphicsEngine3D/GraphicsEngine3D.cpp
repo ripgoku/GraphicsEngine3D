@@ -1,5 +1,6 @@
 ﻿#pragma comment(lib, "freeglut.lib")
 
+#include <GL/glew.h>
 #include <iostream>
 #include "Engine.h"
 

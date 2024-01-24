@@ -1,6 +1,4 @@
 #include "Engine.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 int Engine::windowWidth;
 int Engine::windowHeight;
@@ -11,16 +9,19 @@ bool Engine::isWKeyPressed;
 bool Engine::isSKeyPressed;
 bool Engine::isAKeyPressed;
 bool Engine::isDKeyPressed;
+bool Engine::isFullscreen;
+LightSource light(GL_LIGHT0);
+Ball Engine::sun = Ball(0.2, 100, 100, Material::Glass);
 
 Engine::Engine(int argc, char** argv) {
     glutInit(&argc, argv);
-    isFullscreen = false;
+    isFullscreen = true;
     isRunning = false;
     windowWidth = 1280;
     windowHeight = 720;
     windowTitle = "OpenGL Engine";
     framesPerSecond = 60;
-    isCursorCaptured = true;
+    isCursorCaptured = false;
     isWKeyPressed = false;
     isSKeyPressed = false;
     isAKeyPressed = false;
@@ -30,33 +31,13 @@ Engine::Engine(int argc, char** argv) {
 Engine::~Engine() {
 }
 
-void Engine::mouseMotion(int x, int y) {
-    static int lastX = windowWidth / 2;
-    static int lastY = windowHeight / 2;
-
-    // SprawdŸ czy kursor jest przechwytywany
-    if (isCursorCaptured) {
-        // Oblicz ró¿nicê pozycji myszy
-        float xOffset = x - lastX;
-        float yOffset = lastY - y;
-
-        // Obróæ kamerê na podstawie ruchu myszy
-        camera.rotate(xOffset, yOffset);
-
-        // Ustaw kursor myszy w œrodku okna
-        glutWarpPointer(windowWidth / 2, windowHeight / 2);
-
-        lastX = windowWidth / 2;
-        lastY = windowHeight / 2;
-    }
-}
-
-
 void Engine::init(int width, int height, bool fullscreen, const char* name) {
     windowWidth = width;
     windowHeight = height;
     isFullscreen = fullscreen;
     windowTitle = name;
+
+    sun.setPosition(glm::vec3(3, 2, 0));
 
     // Inicjacja GLUT
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -84,23 +65,9 @@ void Engine::init(int width, int height, bool fullscreen, const char* name) {
     initGL();
 }
 
-void Engine::run() {
-    isRunning = true;
-
-    glutSetCursor(GLUT_CURSOR_NONE);
-
-    glutMainLoop();
-}
-
-void Engine::shutdown() {
-    isRunning = false;
-}
-
 void Engine::initGL() {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // Inne inicjalizacje OpenGL, takie jak ustawienia cieni, tekstur, itp.
 }
 
 void Engine::setupViewport() {
@@ -115,6 +82,136 @@ void Engine::setupViewport() {
     glLoadMatrixf(glm::value_ptr(view));
 }
 
+void Engine::run() {
+    isRunning = true;
+
+    glutSetCursor(GLUT_CURSOR_NONE);
+
+    glutMainLoop();
+}
+
+void Engine::shutdown() {
+    isRunning = false;
+}
+
+void Engine::update() {
+    static float angle = 0.0f;
+    float deltaTime = 1.0f / 10;
+    angle += 0.1f * deltaTime;
+
+    // Obliczanie nowej pozycji na orbicie
+    float x = 3.0f + 4.0f * cos(angle);
+    float z = -1.0f + 4.0f * sin(angle);
+
+    sun.setPosition(glm::vec3(x, 2, z));
+
+
+}
+
+void Engine::render() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    setupViewport();
+
+    LightingManager lightingManager;
+
+    glm::vec3 lightPosition = sun.getPosition();
+
+    light.setPosition(glm::vec4(lightPosition, 1.0f));
+    light.setAmbient(glm::vec4(0.2f, 0.2f, 0.2f, 1.0f));
+    light.setDiffuse(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+    light.setSpecular(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    lightingManager.addLightSource(light);
+    lightingManager.applyLighting();
+    Texture sunTexture;
+    sunTexture.loadTexture("Textury/sun.jpg");
+    sun.drawTexturedBall(sunTexture);
+
+    Ball background(20, 100, 100, Material::Sand);
+    background.setPosition(glm::vec3(0, 0, 0));
+    background.setColor(0.6, 0.6, 1, 1);
+    background.draw();
+
+    Texture grassTexture;
+    grassTexture.loadTexture("Textury/grass.jpg");
+    Cube ssand(1, Material::Sand);
+    ssand.setPosition(glm::vec3(0, -1, -3));
+    ssand.setScale(glm::vec3(20.0f, 0.0f, 12.0f));
+    ssand.setColor(0.965, 0.843, 0.69, 1);
+    ssand.drawTexturedCube(grassTexture);
+
+    Cube newCube(1, Material::Metal);
+    newCube.setPosition(glm::vec3(1, 2, -3));
+    newCube.setRotation(25.0f, glm::vec3(1.0f, 1.0f, 0.0f));
+    newCube.setScale(glm::vec3(1.0f, 1.0f, 1.0f));
+    newCube.setColor(1, 1, 0, 1);
+    newCube.draw();
+
+    Cube secCube(1, Material::Metal);
+    secCube.setPosition(glm::vec3(2, 1, 1));
+    secCube.setColor(0.4, 0.2, 0.6, 1);
+    secCube.draw();
+
+    Cube thrdCube(1, Material::Metal);
+    thrdCube.setPosition(glm::vec3(0.5, 1, -1));
+    thrdCube.setColor(0.4, 0.7, 0.6, 1);
+    thrdCube.draw();
+
+    Cube frthCube(1, Material::Metal);
+    frthCube.setPosition(glm::vec3(3, 2, -2));
+    frthCube.setColor(0.2, 0.9, 0.3, 1);
+    frthCube.setScale(glm::vec3(1.0f, 2.0f, 1.0f));
+    frthCube.setRotation(75.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+    frthCube.draw();
+
+    Ball newBall(2, 100, 100, Material::Metal);
+    newBall.setPosition(glm::vec3(-3, 2, 5));
+    newBall.setScale(glm::vec3(1, 2, 1));
+    newBall.setColor(1, 0, 1, 1);
+    newBall.draw();
+
+    Texture stoneTexture;
+    stoneTexture.loadTexture("Textury/stone.jpg");
+    Cube textureCube(1, Material::Stone);
+    textureCube.setPosition(glm::vec3(0, 0, 0));
+    textureCube.setColor(1, 1, 1, 1);
+    textureCube.setScale(glm::vec3(1.0f, 2.0f, 1.0f));
+    textureCube.drawTexturedCube(stoneTexture);
+
+    Texture soccerTexture;
+    soccerTexture.loadTexture("Textury/soccer.jpg");
+    Ball secBall(0.4, 100, 100, Material::Metal);
+    secBall.setPosition(glm::vec3(3, 2, 1));
+    secBall.drawTexturedBall(soccerTexture);
+
+    Ball thrdBall(0.5, 100, 100, Material::Metal);
+    thrdBall.setPosition(glm::vec3(4, 1, 1));
+    thrdBall.setColor(0, 0.5, 1, 1);
+    thrdBall.draw();
+
+    Ball frthBall(0.5, 100, 100, Material::Metal);
+    frthBall.setPosition(glm::vec3(5.1, 1, -1));
+    frthBall.setColor(0.5, 0.9, 0, 1);
+    frthBall.draw();
+
+    Cone newCone(0.5, 1.0f, 100, 100, Material::Metal);
+    newCone.setPosition(glm::vec3(3, 3, 0));
+    newCone.setColor(0.5, 0.9, 0, 1);
+    newCone.setRotation(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
+    newCone.draw();
+
+    if (isCursorCaptured) {
+        glutWarpPointer(windowWidth / 2, windowHeight / 2);
+    }
+
+    glutSwapBuffers();
+}
+
+void Engine::reshape(int width, int height) {
+    windowWidth = width;
+    windowHeight = height;
+    setupViewport();
+}
 
 void Engine::handleInput() {
     if (isWKeyPressed) {
@@ -133,55 +230,6 @@ void Engine::handleInput() {
         // Przesuniêcie w prawo
         camera.move(glm::vec3(0.0f, 0.0f, 1.0f));
     }
-}
-
-void Engine::update() {
-    // Aktualizacja logiki gry
-}
-
-void Engine::render() {
-    // Tutaj umieœæ kod renderuj¹cy scenê
-    // Na przyk³ad, wyczyszczenie bufora koloru i g³êbokoœci
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Ustaw viewport i perspektywê
-    setupViewport();
-
-    // Przyk³adowe rysowanie obiektów za pomoc¹ klasy GeometryDrawer
-    glColor3f(1.0f, 1.0f, 1.0f);
-    //GeometryDrawer::drawCube(1.0f);
-    //GeometryDrawer::drawFilledCube(0.5f);
-    //GeometryDrawer::drawSphere(0.5f, 20, 20);
-    //GeometryDrawer::drawCone(0.5f, 1.0f, 20, 20);
-
-    // Dodatkowe rysowanie osi
-    GeometryDrawer::drawAxes(1.0f);
-
-    //PrimitiveDrawer::drawPoint(0.0f, 0.0f, 0.0f, 3.0f, 1.0f, 0.0f, 0.0f); // Czerwony punkt
-    //PrimitiveDrawer::drawLine(-3.0f, 0.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f); // Zielona linia
-    //PrimitiveDrawer::drawTriangle(-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f); // Niebieski trójk¹t
-
-    // Przyk³adowe rysowanie szeœcianu
-    TransformableCube myCube(1.0f);
-    myCube.translate(glm::vec3(1.0f, 0.0f, 0.0f));
-    myCube.rotate(45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    myCube.scale(glm::vec3(2.0f, 1.0f, 1.0f));
-    myCube.draw(1.0f, 1.0f, 1.0f);
-
-    // SprawdŸ czy kursor jest przechwytywany
-    if (isCursorCaptured) {
-        // Ustaw kursor myszy w œrodku okna
-        glutWarpPointer(windowWidth / 2, windowHeight / 2);
-    }
-
-    // Na koniec, podmiana buforów
-    glutSwapBuffers();
-}
-
-void Engine::reshape(int width, int height) {
-    windowWidth = width;
-    windowHeight = height;
-    setupViewport();
 }
 
 void Engine::keyboard(unsigned char key, int x, int y) {
@@ -211,7 +259,25 @@ void Engine::keyboard(unsigned char key, int x, int y) {
             glutSetCursor(GLUT_CURSOR_INHERIT);
         }
         break;
-        // ...
+    case 'f':
+        if (!isFullscreen) {
+            glutFullScreen();  // W³¹cz tryb pe³noekranowy
+            isFullscreen = true;
+        }
+        else {
+            glutPositionWindow(0, 0); // Przywróæ pozycjê okna
+            reshape(windowWidth, windowWidth);
+            isFullscreen = false;
+        }
+        break;
+    case 'l':
+        if (light.isEnabled()) {
+            light.disable();
+        }
+        else {
+            light.enable();
+        }
+        break;
     }
 }
 
@@ -236,12 +302,34 @@ void Engine::keyboardUp(unsigned char key, int x, int y) {
     }
 }
 
+void Engine::mouseMotion(int x, int y) {
+    static int lastX = windowWidth / 2;
+    static int lastY = windowHeight / 2;
+
+    // SprawdŸ czy kursor jest przechwytywany
+    if (isCursorCaptured) {
+        // Oblicz ró¿nicê pozycji myszy
+        float xOffset = x - lastX;
+        float yOffset = lastY - y;
+
+        // Obróæ kamerê na podstawie ruchu myszy
+        camera.rotate(xOffset, yOffset);
+
+        // Ustaw kursor myszy w œrodku okna
+        glutWarpPointer(windowWidth / 2, windowHeight / 2);
+
+        lastX = windowWidth / 2;
+        lastY = windowHeight / 2;
+    }
+}
+
 void Engine::cleanUp() {
     // Sprz¹tanie pamiêci, zamkniêcie okna itp.
     glutDestroyWindow(glutGetWindow());
 }
 
 void Engine::timer(int value) {
+    update();
     glutPostRedisplay(); // Przerysuj scenê
     glutTimerFunc(1000 / framesPerSecond, Engine::timer, 0); // Ponownie ustaw timer
 }

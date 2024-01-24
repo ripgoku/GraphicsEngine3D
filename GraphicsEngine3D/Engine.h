@@ -4,11 +4,14 @@
 #include <GL/freeglut.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "GeometryDrawer.h"
-#include "PrimitiveDrawer.h"
-#include "IndexedCube.h"
+#include <glm/gtc/matrix_transform.hpp>
 #include "Camera.h"
-#include "TransformableCube.h"
+#include "LightingManager.h"
+#include "LightSource.h"
+#include "Cube.h"
+#include "Ball.h"
+#include "Cone.h"
+#include "Texture.h"
 
 class Engine {
 public:
@@ -31,7 +34,7 @@ private:
     static int windowWidth;
     static int windowHeight;
     static int framesPerSecond;
-    bool isFullscreen;
+    static bool isFullscreen;
     bool isRunning;
     const char* windowTitle;
     static bool isCursorCaptured;
@@ -39,10 +42,11 @@ private:
     static bool isSKeyPressed;
     static bool isAKeyPressed;
     static bool isDKeyPressed;
+    static Ball sun;
 
     void initGL();
     static void setupViewport();
     void handleInput();
-    void update();
+    static void update();
     void cleanUp();
 };
