@@ -55,7 +55,7 @@ public:
      * @param yOffset Zmiana pozycji myszy w pionie.
      * @param constrainPitch Czy ograniczyæ k¹t pionowy (pitch) kamery.
      */
-    void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
+    void processMouseMovement(float xOffset, float yOffset, bool constrainPitch);
 
     /**
      * @brief Zwraca macierz widoku kamery.

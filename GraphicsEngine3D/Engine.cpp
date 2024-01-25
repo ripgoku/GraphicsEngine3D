@@ -56,6 +56,7 @@ void Engine::init(int width, int height, bool fullscreen, const char* name) {
     glutReshapeFunc(Engine::reshape);
     glutKeyboardFunc(Engine::keyboard);
     glutKeyboardUpFunc(Engine::keyboardUp);
+    glutMouseFunc(Engine::mouseClick);
     glutPassiveMotionFunc(Engine::mouseMotion);
     glutTimerFunc(1000 / framesPerSecond, Engine::timer, 0);
 
@@ -82,8 +83,6 @@ void Engine::setupViewport() {
 void Engine::run() {
     isRunning = true;
 
-    glutSetCursor(GLUT_CURSOR_NONE);
-
     glutMainLoop();
 }
 
@@ -92,6 +91,7 @@ void Engine::shutdown() {
 }
 
 void Engine::update() {
+    handleInput();
     static float angle = 0.0f;
     float deltaTime = 1.0f / 10;
     angle += 0.1f * deltaTime;
@@ -100,8 +100,6 @@ void Engine::update() {
     float z = -1.0f + 4.0f * sin(angle);
 
     sun.setPosition(glm::vec3(x, 2, z));
-
-
 }
 
 void Engine::render() {
@@ -196,10 +194,6 @@ void Engine::render() {
     newCone.setRotation(90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
     newCone.draw();
 
-    if (isCursorCaptured) {
-        glutWarpPointer(windowWidth / 2, windowHeight / 2);
-    }
-
     glutSwapBuffers();
 }
 
@@ -221,6 +215,9 @@ void Engine::handleInput() {
     }
     if (isDKeyPressed) {
         camera.move(glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+    if (isCursorCaptured) {
+        glutWarpPointer(windowWidth / 2, windowHeight / 2);
     }
 }
 
@@ -299,16 +296,27 @@ void Engine::mouseMotion(int x, int y) {
     static int lastY = windowHeight / 2;
 
     if (isCursorCaptured) {
+
         float xOffset = x - lastX;
         float yOffset = lastY - y;
 
-        camera.rotate(xOffset, yOffset);
+        camera.processMouseMovement(xOffset, yOffset, 1);
 
         glutWarpPointer(windowWidth / 2, windowHeight / 2);
 
         lastX = windowWidth / 2;
         lastY = windowHeight / 2;
     }
+}
+
+void Engine::mouseClick(int button, int state, int x, int y) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        setFramesPerSec(framesPerSecond/2);
+    }
+}
+
+void Engine::setFramesPerSec(int newFramesPerSec) {
+    framesPerSecond = newFramesPerSec;
 }
 
 void Engine::cleanUp() {

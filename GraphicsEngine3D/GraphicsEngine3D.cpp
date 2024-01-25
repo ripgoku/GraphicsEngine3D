@@ -19,6 +19,6 @@ int main(int argc, char** argv)
 {
     Engine engine(argc, argv);
     engine.init(1280, 720, false, "Example title");
-    glutMainLoop();
+    engine.run();
     return 0;
 }

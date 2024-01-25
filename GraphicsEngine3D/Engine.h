@@ -120,6 +120,34 @@ public:
      */
     static void mouseMotion(int x, int y);
 
+    /**
+     * @brief Obs³uga zdarzeñ klikniêcia myszy.
+     *
+     * Ta funkcja jest wywo³ywana, gdy u¿ytkownik klika przyciskiem myszy. Pozwala na reakcjê
+     * silnika na akcje myszy, takie jak klikniêcie lewym lub prawym przyciskiem myszy.
+     * Mo¿e byæ u¿ywana do interakcji z obiektami 3D, zmiany ustawieñ kamery, itp.
+     *
+     * @param button Okreœla, który przycisk myszy zosta³ naciœniêty. Mo¿liwe wartoœci to:
+     *               GLUT_LEFT_BUTTON, GLUT_MIDDLE_BUTTON, GLUT_RIGHT_BUTTON.
+     * @param state Okreœla stan przycisku myszy. Mo¿liwe wartoœci to:
+     *              GLUT_UP (przycisk zwolniony), GLUT_DOWN (przycisk wciœniêty).
+     * @param x Pozycja x kursora myszy w momencie klikniêcia.
+     * @param y Pozycja y kursora myszy w momencie klikniêcia.
+     */
+    static void mouseClick(int button, int state, int x, int y);
+
+    /**
+     * @brief Ustawia iloœæ klatek na sekundê (FPS) dla silnika.
+     *
+     * Ta funkcja pozwala na zmianê liczby klatek na sekundê (FPS), co wp³ywa na p³ynnoœæ animacji
+     * i renderowania sceny. Wy¿sza liczba FPS mo¿e zwiêkszyæ p³ynnoœæ animacji, ale równie¿
+     * zwiêksza obci¹¿enie procesora i karty graficznej.
+     *
+     * @param newFramesPerSec Nowa liczba klatek na sekundê do ustawienia. Powinna byæ wartoœci¹
+     *                        dodatni¹.
+     */
+    static void setFramesPerSec(int newFramesPerSec);
+
 private:
     static Camera camera;
     static int windowWidth;
@@ -156,7 +184,7 @@ private:
      * Ka¿de wciœniêcie klawisza powoduje odpowiedni¹ reakcjê kamery, tak¹ jak przemieszczenie lub obrót.
      * Funkcja jest wywo³ywana w pêtli g³ównej gry, aby zapewniæ ci¹g³¹ odpowiedŸ na wejœcie u¿ytkownika.
      */
-    void handleInput();
+    static void handleInput();
 
     /**
      * @brief Aktualizuje stan silnika.
